@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.makeus.minkyu.commentpopupsample.ui.view.CommentPanel xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/comment_panel"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@android:color/white">
+  <RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_margin="15dp"
+      android:text="댓글 28개"/>
+    <RelativeLayout
+      android:id="@+id/title_body"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:visibility="gone">
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:textSize="20sp"
+        android:text="댓글(2,300개)"/>
+
+      <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="10dp"
+        android:text="닫기"
+        android:padding="8dp"
+        android:background="@drawable/rounded_button"/>
+    </RelativeLayout>
+  </RelativeLayout>
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="1px"
+    android:background="@android:color/black"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp" />
+
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="20px" />
+  <View
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    android:background="@android:color/black"
+    android:layout_marginLeft="15dp"
+    android:layout_marginRight="15dp" />
+</com.makeus.minkyu.commentpopupsample.ui.view.CommentPanel>
