@@ -14,12 +14,8 @@ import butterknife.InjectView;
 
 public class MainActivity extends ActionBarActivity {
 
-  boolean panelInitialized = false;
-
-  @InjectView(R.id.main_body)
-  TrackableScrollView mainBody;
-  @InjectView(R.id.comment_panel)
-  CommentPanel commentPanel;
+  @InjectView(R.id.main_body) TrackableScrollView mainBody;
+  @InjectView(R.id.comment_panel) CommentPanel commentPanel;
   @InjectView(R.id.fake_comment_panel) View fakeCommentPanel;
   @InjectView(R.id.popup_blur) View viewBlur;
 
