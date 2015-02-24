@@ -72,7 +72,7 @@ public class CommentPanelTrackingHelper {
     this.fakeTrackingView = null;
     if (isBlurEnabled)
       this.blurView = null;
-
-    System.gc();
+    this.isBlurEnabled = false;
+    this.isInitialized = false;
   }
 }
