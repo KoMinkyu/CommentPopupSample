@@ -7,6 +7,7 @@ import android.view.View;
  */
 public class CommentPanelTrackingHelper {
 
+  private static final String TAG = "CommentPanel";
   private static CommentPanelTrackingHelper instance = new CommentPanelTrackingHelper();
 
   private TrackableScrollView mainView;
