@@ -40,14 +40,14 @@ public class TrackableScrollView extends ScrollView {
   private boolean isEndOfScroll = false;
   private boolean isPivotInitialized = false;
 
-  private CommentPanelTrackingHelper commentPanelTrackingHelper;
+  private TrackingManager trackingManager;
 
   public TrackableScrollView(final Context context, AttributeSet attrs) {
     super(context, attrs);
     this.context = context;
 
     this.setOverScrollScale();
-    commentPanelTrackingHelper = CommentPanelTrackingHelper.getInstance();
+    trackingManager = TrackingManager.getInstance();
   }
 
   private void setOverScrollScale() {
@@ -79,11 +79,11 @@ public class TrackableScrollView extends ScrollView {
   }
 
   private void trackTrackingView() {
-    if (!commentPanelTrackingHelper.isInitialized)
+    if (!trackingManager.isInitialized)
       return;
 
-    if (!commentPanelTrackingHelper.isTrackingViewAnimating() &&
-        !commentPanelTrackingHelper.getTrackingView().isMaximized()) {
+    if (!trackingManager.isTrackingViewAnimating() &&
+        !trackingManager.getTrackingView().isMaximized()) {
       float overScrolledRatio = getOverScrolledRatio();
       translateTrackingView(overScrolledRatio);
       translateScrollTargetView(overScrolledRatio);
@@ -100,8 +100,8 @@ public class TrackableScrollView extends ScrollView {
   }
 
   private void translateTrackingView(float overScrolledRatio) {
-    final View trackingView = commentPanelTrackingHelper.getTrackingView();
-    final View fakeTrackingView = commentPanelTrackingHelper.getFakeTrackingView();
+    final View trackingView = trackingManager.getTrackingView();
+    final View fakeTrackingView = trackingManager.getFakeTrackingView();
     final View scrollTargetView = getChildAt(getChildCount() - 1);
 
     if (trackingView == null || fakeTrackingView == null || scrollTargetView == null) return;
@@ -129,7 +129,7 @@ public class TrackableScrollView extends ScrollView {
     final boolean notOversrollable = isNotOverscrollable(scrollY);
 
     if (notOversrollable) {
-      commentPanelTrackingHelper.setBlurViewAlpha(0.0f);
+      trackingManager.setBlurViewAlpha(0.0f);
       setScale(1.0f);
       getChildAt(getChildCount() - 1).setTranslationY(0.0f);
     }
@@ -159,7 +159,7 @@ public class TrackableScrollView extends ScrollView {
 
   private void setAlphaBlurViewWithOverScroll(float overScrolledRatio) {
     float alphaRatio = 0.5f * overScrolledRatio;
-    commentPanelTrackingHelper.setBlurViewAlpha(alphaRatio);
+    trackingManager.setBlurViewAlpha(alphaRatio);
   }
 
   private void setScale(float scaleRatio) {
@@ -168,18 +168,18 @@ public class TrackableScrollView extends ScrollView {
   }
 
   private boolean isNotOverscrollable(int scrollY) {
-    return scrollY <= 0 || commentPanelTrackingHelper.isTrackingViewAnimating();
+    return scrollY <= 0 || trackingManager.isTrackingViewAnimating();
   }
 
   @Override public boolean onTouchEvent(MotionEvent e) {
-    if (commentPanelTrackingHelper.isTrackingViewAnimating())
+    if (trackingManager.isTrackingViewAnimating())
       return false;
 
     return super.onTouchEvent(e);
   }
 
   @Override public boolean onInterceptTouchEvent(MotionEvent e) {
-    if (commentPanelTrackingHelper.isTrackingViewAnimating())
+    if (trackingManager.isTrackingViewAnimating())
       return false;
 
     return super.onInterceptTouchEvent(e);

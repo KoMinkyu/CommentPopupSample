@@ -54,7 +54,7 @@ public class CommentPanel extends LinearLayout {
   private int minFlingVelocity;
   private int maxFlingVelocity;
 
-  private CommentPanelTrackingHelper commentPanelTrackingHelper;
+  private TrackingManager trackingManager;
 
   public CommentPanel(Context context) {
     super(context);
@@ -82,7 +82,7 @@ public class CommentPanel extends LinearLayout {
 
     this.interpolator = new OvershootInterpolator(2.0f);
 
-    this.commentPanelTrackingHelper = CommentPanelTrackingHelper.getInstance();
+    this.trackingManager = TrackingManager.getInstance();
   }
 
   @Override public boolean onInterceptTouchEvent(MotionEvent e) {
@@ -194,8 +194,8 @@ public class CommentPanel extends LinearLayout {
 
   private int getOffsetForState(State state) {
 
-    final View fakeTrackingView = commentPanelTrackingHelper.getFakeTrackingView();
-    final ScrollView scrollView = commentPanelTrackingHelper.getMainView();
+    final View fakeTrackingView = trackingManager.getFakeTrackingView();
+    final ScrollView scrollView = trackingManager.getMainView();
 
     switch(state) {
       default:

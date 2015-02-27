@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+  <com.makeus.minkyu.commentpopupsample.ui.view.OverscrollScrollView
+    android:id="@+id/main_body"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+    <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical">
+      <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/a"/>
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:background="@android:color/transparent" />
+      <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/b"/>
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:background="@android:color/transparent" />
+      <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/c"/>
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:background="@android:color/transparent" />
+      <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/d"/>
+      <View
+        android:layout_width="match_parent"
+        android:layout_height="20px"
+        android:background="@android:color/transparent" />
+      <View
+        android:id="@+id/fake_comment_panel"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@android:color/transparent" />
+    </LinearLayout>
+  </com.makeus.minkyu.commentpopupsample.ui.view.OverscrollScrollView>
+</LinearLayout>

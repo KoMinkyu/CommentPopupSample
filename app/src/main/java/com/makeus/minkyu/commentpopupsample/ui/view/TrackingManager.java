@@ -5,10 +5,10 @@ import android.view.View;
 /**
  * Created by minkyu on 2015. 2. 16..
  */
-public class CommentPanelTrackingHelper {
+public class TrackingManager {
 
   private static final String TAG = "CommentPanel";
-  private static CommentPanelTrackingHelper instance = new CommentPanelTrackingHelper();
+  private static TrackingManager instance = new TrackingManager();
 
   private TrackableScrollView mainView;
   private CommentPanel trackingView;
@@ -18,9 +18,9 @@ public class CommentPanelTrackingHelper {
   public boolean isInitialized = false;
   private boolean isBlurEnabled = false;
 
-  private CommentPanelTrackingHelper() {}
+  private TrackingManager() {}
 
-  public static CommentPanelTrackingHelper getInstance() {
+  public static TrackingManager getInstance() {
     return instance;
   }
 
