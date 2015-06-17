@@ -37,10 +37,13 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
   private float nextScrollSpeed;
   private ValueAnimator offsetAnimator;
   private float offsetY;
+
   private OnBottomPullListener onBottomPullListener;
   private List<OnPullBeginListener> onPullBeginListeners;
   private OnPullReleaseListener onPullReleaseListener;
   private OnTopPullListener onTopPullListener;
+  private TouchHandler touchHandler;
+
   private OverscrollTranslator overscrollTranslator;
   private float screenHeight;
   private ViewTreeObserver.OnScrollChangedListener scrollListener;
@@ -157,13 +160,10 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
   }
 
   private void invokePullRelease() {
-    Log.v("TAG", "pull released");
     final float overscrollAmount = this.getOverscrollAmount();
     if (this.isScrolledToTop()) {
       this.bouncer.pullReleaseSnapback(overscrollAmount, this, true);
     } else {
-      Log.v("TAG", "bottom pull released");
-      Log.v("TAG", "overscrollAmount:"+overscrollAmount);
       this.bouncer.pullReleaseSnapback(-overscrollAmount, this, false);
     }
     if (this.onPullReleaseListener != null) {
@@ -265,6 +265,10 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
 
   @Override
   public boolean onTouchEvent(final MotionEvent motionEvent) {
+    if (this.touchHandler != null) {
+      if (touchHandler.blockTouch()) return false;
+    }
+
     if (this.isScrolledToBottom() && this.offsetY < 0.0f) {
       if (this.scrollMode == MODE.NO_OFFSET) {
         this.touchDownY = motionEvent.getRawY();
@@ -306,7 +310,7 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
   }
 
   public void setMaxOverscrollBounds(final float n) {
-    (this.offsetAnimator = ValueAnimator.ofFloat(new float[] { 0.0f, n }).setDuration(10000L)).setInterpolator((TimeInterpolator) new DecelerateInterpolator(1.6f));
+    (this.offsetAnimator = ValueAnimator.ofFloat(new float[] { 0.0f, n }).setDuration(10000L)).setInterpolator(new DecelerateInterpolator(1.6f));
   }
 
   public void setOnBottomPullListener(final OnBottomPullListener onBottomPullListener) {
@@ -333,6 +337,10 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
     this.scrollListener = scrollListener;
   }
 
+  public void setTouchHandler(final TouchHandler touchHandler) {
+    this.touchHandler = touchHandler;
+  }
+
   static enum MODE
   {
     BOTTOM_OFFSET,
@@ -340,8 +348,11 @@ public class OverscrollScrollView extends ScrollView implements Overscrollable {
     TOP_OFFSET;
   }
 
-  public interface OnPullBeginListener
-  {
+  public interface OnPullBeginListener {
     void onPullBegin(View p0);
+  }
+
+  public interface TouchHandler {
+    boolean blockTouch();
   }
 }

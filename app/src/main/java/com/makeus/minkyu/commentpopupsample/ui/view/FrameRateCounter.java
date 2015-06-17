@@ -17,9 +17,6 @@ public class FrameRateCounter {
     if (bool)
       f = (float)l2 / 1000.0F;
     mLastTime = l1;
-    Log.v("TAG", "uptimeMillis:" + l1);
-    Log.v("TAG", "delay:" + l2);
-    Log.v("TAG", "f?:" + f);
 //    return Math.min(0.021F, f);
     return 0.021F;
   }

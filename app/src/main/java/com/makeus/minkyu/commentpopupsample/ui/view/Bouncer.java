@@ -70,7 +70,6 @@ public class Bouncer
   }
 
   private void startBounceAnim(final ViewGroup viewGroup) {
-    Log.v("TAG", "Bounce animation starter|density:" + density);
     this.anim = ValueAnimator.ofFloat(new float[] { 0.0f, 10000.0f }).setDuration(7000L);
     this.anim.addUpdateListener(this.getListener(viewGroup, this.density));
     this.anim.start();

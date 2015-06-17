@@ -9,8 +9,8 @@ import android.view.View;
 import android.widget.ScrollView;
 
 /**
- * Created by minkyu on 2015. 2. 11..
- */
+* Created by minkyu on 2015. 2. 11..
+*/
 
 public class TrackableScrollView extends ScrollView {
 

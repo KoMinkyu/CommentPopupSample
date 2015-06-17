@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
   <com.makeus.minkyu.commentpopupsample.ui.view.OverscrollScrollView
@@ -51,4 +50,10 @@
         android:background="@android:color/transparent" />
     </LinearLayout>
   </com.makeus.minkyu.commentpopupsample.ui.view.OverscrollScrollView>
-</LinearLayout>
+  <View android:id="@+id/popup_blur"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:background="@android:color/black"
+        android:alpha="0" />
+  <include layout="@layout/comment_body" />
+</FrameLayout>

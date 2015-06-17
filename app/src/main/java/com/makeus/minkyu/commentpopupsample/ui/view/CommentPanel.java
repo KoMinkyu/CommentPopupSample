@@ -4,12 +4,17 @@ import android.content.Context;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
+import android.support.v4.view.ViewPropertyAnimatorListener;
+import android.support.v4.view.ViewPropertyAnimatorUpdateListener;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.animation.Interpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.LinearLayout;
@@ -29,12 +34,23 @@ public class CommentPanel extends LinearLayout {
     void onStateChangedListener(State chagnedState);
   }
 
+  public interface OnGetOffsetForState {
+    int getOffsetForState(State state);
+  }
+
+  public interface OnAnimationUpdateListener {
+    void onAnimationUpdate(float animatedTranslationY);
+  }
+
   private Context context;
 
   private static final int ANIMATION_DURATION = 500;
 
   private OnStateChangedListener onStateChangedListener;
-  private State currentState;
+  private OnGetOffsetForState onGetOffsetForState;
+  private OnAnimationUpdateListener onAnimationUpdateListener;
+
+  private State currentState = State.Minimized;
   private int panelOffsetY;
 
   private OvershootInterpolator interpolator;
@@ -53,8 +69,6 @@ public class CommentPanel extends LinearLayout {
   private int pagingTouchSlop;
   private int minFlingVelocity;
   private int maxFlingVelocity;
-
-  private TrackingManager trackingManager;
 
   public CommentPanel(Context context) {
     super(context);
@@ -80,9 +94,7 @@ public class CommentPanel extends LinearLayout {
     this.minFlingVelocity = viewConfiguration.getScaledMinimumFlingVelocity();
     this.maxFlingVelocity = viewConfiguration.getScaledMaximumFlingVelocity();
 
-    this.interpolator = new OvershootInterpolator(2.0f);
-
-    this.trackingManager = TrackingManager.getInstance();
+    this.interpolator = new OvershootInterpolator(1.5f);
   }
 
   @Override public boolean onInterceptTouchEvent(MotionEvent e) {
@@ -95,8 +107,7 @@ public class CommentPanel extends LinearLayout {
   @Override public boolean onTouchEvent(MotionEvent e) {
     final int action = MotionEventCompat.getActionMasked(e);
 
-    if (isAnimating())
-      return true;
+    if (isAnimating()) return true;
 
     if (gestureDetector == null) {
       DoubleTapListener doubleTapListener = getDoubleTapListener();
@@ -113,21 +124,14 @@ public class CommentPanel extends LinearLayout {
 
     if (!isTracking && !trackCapturedMovement(e)) return true;
 
-    if (action != MotionEvent.ACTION_MOVE || isTrackingAvailable(e))
+    if (action != MotionEvent.ACTION_MOVE)
       velocityTracker.addMovement(e);
 
     if (action == MotionEvent.ACTION_MOVE) {
       float eventPosY = e.getY();
-
-      if (currentState == State.Minimized && eventPosY > startY || currentState == State.Maximized && eventPosY < startY)
-        return true;
-
-      if (currentState == State.Minimized && eventPosY > oldY || currentState == State.Maximized && eventPosY < oldY)
-        velocityTracker.clear();
-
-      int traveledDistance = Math.round(Math.abs(eventPosY - startY));
+      int traveledDistance = Math.round(eventPosY - startY);
       if (currentState == State.Minimized)
-        traveledDistance = getOffsetForState(State.Minimized) - traveledDistance;
+        traveledDistance = getOffsetForState(State.Minimized) + traveledDistance;
 
       setNewOffsetY(traveledDistance);
       oldY = eventPosY;
@@ -173,12 +177,8 @@ public class CommentPanel extends LinearLayout {
     velocityTracker.addMovement(e);
 
     if (action == MotionEvent.ACTION_MOVE) {
-      if (!this.isTrackingAvailable(e)) {
-        isPreTracking = false;
-        return false;
-      }
-
       double distance = Math.abs(e.getY() - startY);
+
       if (distance < pagingTouchSlop) return false;
     }
 
@@ -193,22 +193,22 @@ public class CommentPanel extends LinearLayout {
   }
 
   private int getOffsetForState(State state) {
+    if (onGetOffsetForState != null) return onGetOffsetForState.getOffsetForState(state);
 
-    final View fakeTrackingView = trackingManager.getFakeTrackingView();
-    final ScrollView scrollView = trackingManager.getMainView();
-
+    View parentView = (View) getParent();
     switch(state) {
       default:
       case Minimized:
-        return fakeTrackingView.getTop() - scrollView.getScrollY();
+        return parentView.getBottom();
       case Maximized:
         return 0;
     }
   }
 
   private void setNewOffsetY(int newOffsetY) {
-    panelOffsetY = Math.min(Math.max( getOffsetForState(State.Maximized), newOffsetY), getOffsetForState(State.Minimized));
-    setTranslationY(panelOffsetY);
+    if (onAnimationUpdateListener != null)
+      onAnimationUpdateListener.onAnimationUpdate(newOffsetY);
+    setTranslationY(newOffsetY);
   }
 
   public void setState(final State newState, boolean animate) {
@@ -229,6 +229,13 @@ public class CommentPanel extends LinearLayout {
   private void animateTranslationY(int translation, int duration, Interpolator interpolator, Runnable callback) {
     ViewPropertyAnimatorCompat animator = ViewCompat.animate(this);
     animator.setDuration(duration).translationY(translation);
+    animator.setUpdateListener(new ViewPropertyAnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(View view) {
+        if (onAnimationUpdateListener == null) return;
+        onAnimationUpdateListener.onAnimationUpdate(getTranslationY());
+      }
+    });
 
     if (callback != null)
       animator.withEndAction(callback);
@@ -265,7 +272,25 @@ public class CommentPanel extends LinearLayout {
   }
 
   public void setOnStateChangedListener(OnStateChangedListener l) {
+    if (l == null) {
+      throw new IllegalArgumentException("OnStateChangedListener cannot be initialized with null");
+    }
     this.onStateChangedListener = l;
+  }
+
+  public void setOnGetOffsetForState(OnGetOffsetForState onGetOffsetForState) {
+    if (onGetOffsetForState == null)
+      throw new IllegalArgumentException("OnGetOffsetForState cannot be initialized with null");
+
+    this.onGetOffsetForState = onGetOffsetForState;
+
+  }
+
+  public void setOnAnimationUpdateListener(OnAnimationUpdateListener onAnimationUpdateListener) {
+    if (onAnimationUpdateListener == null)
+      throw new IllegalArgumentException("OnAnimationUpdateListener cannot be initialized with null");
+
+    this.onAnimationUpdateListener = onAnimationUpdateListener;
   }
 
   private class DoubleTapListener extends GestureDetector.SimpleOnGestureListener {
